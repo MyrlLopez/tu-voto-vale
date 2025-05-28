@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Votación</title>
+  <style>
+    .votacion {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .votacion img {
+      margin-right: 10px;
+    }
+    .contador {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>VOTACIÓN PRINCIPAL</h2>
+<div id="votaciones"></div>
+
+<h1>SEGUNDAS OPCIONES</h1>
+<div id="votaciones2"></div>
+
+<p>Esta es una elección. El que tenga más votos ganará. El top 1 se revelará el 15 de julio.</p>
+
+<script>
+  const imagenes = [
+    "voto.png", "OIP.jpg", "you.png", "netflix-symbol-black.png", "R.png",
+    "OIP (1).jpg", "OIP (2).jpg", "OIP (3).jpg",
+    "OIP (4).jpg", "facebook-6338509_960_720.webp", "R (1).png",
+    "OIP (5).jpg", "games_thumbnail_brawlstars.5cd76330.jpg", "OIP (6).jpg"
+  ];
+
+  const anchuras = [
+    100,100,100,100,100,100,100,100,
+    50,50,50,50,50,50
+  ];
+
+  let votos = JSON.parse(localStorage.getItem("votos")) || Array(imagenes.length).fill(0);
+  let yaVoto = localStorage.getItem("yaVoto") === "true";
+
+  function guardarVotos() {
+    localStorage.setItem("votos", JSON.stringify(votos));
+  }
+
+  function crearVotaciones() {
+    const contenedorPrincipal = document.getElementById("votaciones");
+    const contenedorSecundario = document.getElementById("votaciones2");
+
+    imagenes.forEach((src, index) => {
+      const div = document.createElement("div");
+      div.className = "votacion";
+
+      const img = document.createElement("img");
+      img.src = src;
+      img.width = anchuras[index];
+
+      const btn = document.createElement("button");
+      btn.textContent = "Votar";
+      btn.disabled = yaVoto;
+      btn.onclick = () => votar(index);
+
+      const span = document.createElement("span");
+      span.className = "contador";
+      span.id = "contador" + index;
+      span.textContent = `${votos[index]} votos`;
+
+      div.appendChild(img);
+      div.appendChild(btn);
+      div.appendChild(span);
+
+      if (index < 8) {
+        contenedorPrincipal.appendChild(div);
+      } else {
+        contenedorSecundario.appendChild(div);
+      }
+    });
+  }
+
+  function votar(index) {
+    if (yaVoto) {
+      alert("¡Ya votaste! Solo puedes votar una vez.");
+      return;
+    }
+
+    votos[index]++;
+    document.getElementById("contador" + index).textContent = `${votos[index]} votos`;
+    guardarVotos();
+    localStorage.setItem("yaVoto", "true");
+    yaVoto = true;
+
+    // Desactivar todos los botones después de votar
+    const botones = document.querySelectorAll("button");
+    botones.forEach(btn => btn.disabled = true);
+
+    alert("¡Gracias por votar!");
+  }
+
+  crearVotaciones();
+</script>
+
+</body>
+</html>
